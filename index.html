@@ -8,14 +8,61 @@
         margin: 0;
         overflow: hidden;
       }
+      #canvas {
+       position: absolute;
+       top: 0;
+       left: 0;
+       z-index: 1;
+       width: 100%;
+       height: 100%;
+      }
+      #create-blank-cube {
+       background-color: black;
+       border: none;
+       color: white;
+       padding: 15px 32px;
+       text-align: center;
+       text-decoration: none;
+       display: inline-block;
+       font-size: 16px;
+       margin: 20px;
+       cursor: pointer;
+       border-radius: 10px;
+       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+       position: absolute;
+       top: 20px;
+       left: 20px;
+       z-index: 2;
+      } 
     </style>
   </head>
   <body>
+    <button id="create-blank-cube" onclick="createBlankCube()">Create Blank Cube</button>
+    <canvas id="canvas">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="blankcube.js"></script>
     <script>
       let container, camera, scene, renderer, cube;
       let isDragging = false;
       let previousMousePosition = { x: 0, y: 0 };
+
+      // Get the button element
+      const button = document.querySelector('#create-blank-cube');
+
+      // Add a click event listener to the button
+      button.addEventListener('click', changeColors);
+
+      // Function to change the colors of the button and cube
+      function changeColors() {
+      // Generate a random color
+       const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+  
+       // Update the color of the button
+       button.style.backgroundColor = color;
+  
+        // Update the color of the cube
+       cube.material.color.set(color);
+     }
 
       function init() {
         container = document.createElement("div");
@@ -35,6 +82,21 @@
         const material = new THREE.MeshNormalMaterial();
         cube = new THREE.Mesh(geometry, material);
         scene.add(cube);
+
+         // Add a starfield to the background
+         const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
+        const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const starField = new THREE.Group();
+        for (let i = 0; i < 200; i++) {
+          const star = new THREE.Mesh(starGeometry, starMaterial);
+          star.position.set(
+            THREE.MathUtils.randFloatSpread(100),
+            THREE.MathUtils.randFloatSpread(100),
+            THREE.MathUtils.randFloatSpread(100)
+          );
+          starField.add(star);
+        }
+        scene.add(starField);
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -154,9 +216,12 @@
        cube.rotation.x += dy * 0.01;
     }
 
+     
+
 
       const startTime = Date.now();
       init();
     </script>
+    </canvas>
   </body>
 </html>
